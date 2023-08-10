@@ -1,3 +1,5 @@
+// Class for storing user tasks
+
 package com.example;
 
 public class Task {
