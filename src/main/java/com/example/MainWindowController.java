@@ -1,6 +1,5 @@
 package com.example;
 
-import java.io.IOException;
 import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.stage.*;
@@ -16,7 +15,12 @@ public class MainWindowController implements Initializable{
 
     // Method to open the popup window to add task
     @FXML
-    public void addTask() {
+    private void addTask() {
+        // Open the popup window
+        openPopup();
+    }
+
+    private void openPopup() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("addtaskwindow.fxml"));
             Parent root = loader.load();
