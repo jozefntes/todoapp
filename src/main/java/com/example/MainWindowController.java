@@ -6,18 +6,28 @@ import javafx.scene.control.*;
 import javafx.stage.*;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class MainWindowController implements Initializable{
     @FXML private ComboBox<LocalDate> dateChoiceBox;
+    @FXML private Label displayDateLabel;
 
     // Initialization logic for the main window
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         List<LocalDate> dateList = generateDateList();
         dateChoiceBox.getItems().addAll(dateList);
+        // Set a custom cell factory to display formatted dates in the ComboBox
+        dateChoiceBox.setCellFactory(param -> new DateListCell());
+        dateChoiceBox.setButtonCell(new DateListCell());
+        
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+        String formattedDate = today.format(formatter);
+        displayDateLabel.setText(formattedDate);
     }
 
     private List<LocalDate> generateDateList() {
@@ -29,6 +39,22 @@ public class MainWindowController implements Initializable{
         }
         
         return dateList;
+    }
+
+    // Custom ListCell to format the dates in the ComboBox
+    private class DateListCell extends ListCell<LocalDate> {
+        private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+
+        @Override
+        protected void updateItem(LocalDate date, boolean empty) {
+            super.updateItem(date, empty);
+
+            if (empty || date == null) {
+                setText(null);
+            } else {
+                setText(date.format(formatter));
+            }
+        }
     }
 
     // Method to open the popup window to add task
@@ -55,5 +81,13 @@ public class MainWindowController implements Initializable{
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void displayTasksFromDate() {
+        LocalDate selectedDate = dateChoiceBox.getSelectionModel().getSelectedItem();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+        String formattedDate = selectedDate.format(formatter);
+        displayDateLabel.setText(formattedDate);
     }
 }

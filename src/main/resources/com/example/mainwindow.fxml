@@ -37,7 +37,7 @@
                   </Label>
                </children>
             </VBox>
-            <ComboBox fx:id="dateChoiceBox" prefWidth="150.0" promptText="Date" style="-fx-font-size: 17;">
+            <ComboBox fx:id="dateChoiceBox" onAction="#displayTasksFromDate" promptText="Date" style="-fx-font-size: 17;">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
@@ -60,7 +60,7 @@
          <children>
             <VBox alignment="CENTER" prefHeight="100.0" style="-fx-background-color: #a28ae3;">
                <children>
-                  <Label text="Today, Aug 28" textFill="WHITE">
+                  <Label fx:id="displayDateLabel" textFill="WHITE">
                      <font>
                         <Font size="19.0" />
                      </font>
