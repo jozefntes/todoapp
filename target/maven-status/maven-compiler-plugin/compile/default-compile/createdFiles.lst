@@ -1,5 +1,7 @@
+com/example/DatabaseService.class
+com/example/TestingController$Task.class
 com/example/AddTaskWindowController.class
 com/example/App.class
 module-info.class
-com/example/Task.class
+com/example/TestingController.class
 com/example/MainWindowController.class

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.TestingController">
+    <TableView fx:id="taskTableView" prefHeight="300">
+        <columns>
+            <TableColumn text="Task" fx:id="taskColumn" />
+            <TableColumn text="Completed" fx:id="completedColumn" />
+        </columns>
+    </TableView>
+</VBox>

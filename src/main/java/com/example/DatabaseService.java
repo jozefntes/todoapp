@@ -6,8 +6,10 @@ import java.time.LocalDate;
 public class DatabaseService {
     private static final String DB_URL = "jdbc:sqlite:tododatabase.db";
 
-    public void addTask(String taskName, LocalDate date, String tag, String type) {
-        String insertQuery = "INSERT INTO tasks (taskname, date, tag, type) VALUES (?, ?, ?, ?)";
+    public void addTask(String taskName, LocalDate date, String tag, boolean priority, boolean complete) {
+        String insertQuery = "INSERT INTO tasks (taskname, date, tag, priority, complete) VALUES (?, ?, ?, ?, ?)";
+        int priorityInt = priority ? 1 : 0;
+        int completeInt = complete ? 1 : 0;
 
         try (Connection connection = DriverManager.getConnection(DB_URL);
                 PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
@@ -15,7 +17,9 @@ public class DatabaseService {
             preparedStatement.setString(1, taskName);
             preparedStatement.setString(2, date.toString());
             preparedStatement.setString(3, tag);
-            preparedStatement.setString(4, type);
+            preparedStatement.setInt(4, priorityInt);
+            preparedStatement.setInt(5, completeInt);
+
 
             preparedStatement.executeUpdate();
         } catch (SQLException e) {

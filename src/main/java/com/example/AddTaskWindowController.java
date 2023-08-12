@@ -11,7 +11,7 @@ public class AddTaskWindowController{
     @FXML private TextField nameField;
     @FXML private DatePicker datePicker;
     @FXML private TextField tagField;
-    @FXML private TextField typeField;
+    @FXML private CheckBox priorityCheckBox;
     @FXML private Button addButton;
 
     private DatabaseService databaseService = new DatabaseService();
@@ -21,9 +21,9 @@ public class AddTaskWindowController{
         String taskName = nameField.getText();
         LocalDate date = datePicker.getValue();
         String tag = tagField.getText();
-        String type = typeField.getText();
+        boolean priority = priorityCheckBox.isSelected();
 
-        databaseService.addTask(taskName, date, tag, type);
+        databaseService.addTask(taskName, date, tag, priority, false);
         clearFields();
         closePopupWindow();
     }
@@ -32,7 +32,7 @@ public class AddTaskWindowController{
         nameField.clear();
         datePicker.setValue(null);
         tagField.clear();
-        typeField.clear();
+        priorityCheckBox.setSelected(false);
     }
 
     private void closePopupWindow() {
