@@ -2,6 +2,8 @@ package com.example;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseService {
     private static final String DB_URL = "jdbc:sqlite:tododatabase.db";
@@ -28,19 +30,48 @@ public class DatabaseService {
         }
     }
 
-    public ResultSet retrieveTasks() {
-        String selectQuery = "SELECT * FROM tasks";
-        ResultSet resultSet = null;
+    public List<Task> retrieveTasksForDate(LocalDate date) {
+        List<Task> tasks = new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM tasks WHERE date = ?";
 
         try (Connection connection = DriverManager.getConnection(DB_URL);
                 PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
 
-            resultSet = preparedStatement.executeQuery();
+            preparedStatement.setString(1, date.toString());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String taskName = resultSet.getString("taskname");
+                boolean completed = resultSet.getInt("complete") == 1;
+                String tag = resultSet.getString("tag");
+                boolean priority = resultSet.getInt("priority") == 1;
+                Task task = new Task(taskName, completed, tag, priority);
+                tasks.add(task);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             // Handle the exception
         }
 
-        return resultSet;
+        return tasks;
+    }
+
+    public void updateTaskCompletedStatus(String taskName, boolean completed) {
+        String updateQuery = "UPDATE tasks SET complete = ? WHERE taskname = ?";
+
+        try (Connection connection = DriverManager.getConnection(DB_URL);
+                PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+
+            int completeInt = completed ? 1 : 0;
+
+            preparedStatement.setInt(1, completeInt);
+            preparedStatement.setString(2, taskName);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
     }
 }

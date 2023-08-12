@@ -85,7 +85,7 @@
             </VBox>
             <VBox>
                <children>
-                  <ListView prefHeight="200.0" prefWidth="200.0" />
+                  <ListView fx:id="taskListView" maxHeight="1.7976931348623157E308" prefHeight="980.0" prefWidth="768.0" />
                </children>
             </VBox>
          </children>

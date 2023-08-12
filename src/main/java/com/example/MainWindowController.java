@@ -14,6 +14,9 @@ import java.util.ResourceBundle;
 public class MainWindowController implements Initializable{
     @FXML private ComboBox<LocalDate> dateChoiceBox;
     @FXML private Label displayDateLabel;
+    @FXML private ListView<Task> taskListView;
+
+    DatabaseService databaseService = new DatabaseService();
 
     // Initialization logic for the main window
     @Override
@@ -28,8 +31,16 @@ public class MainWindowController implements Initializable{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
         String formattedDate = today.format(formatter);
         displayDateLabel.setText(formattedDate);
+
+        updateTaskListView(today);
     }
 
+    private List<Task> retrieveTasksForDate(LocalDate date) {
+        // Fetch tasks from your database based on the date
+        // Return a list of Task objects
+        return databaseService.retrieveTasksForDate(date);
+    }
+    
     private List<LocalDate> generateDateList() {
         List<LocalDate> dateList = new ArrayList<>();
         LocalDate today = LocalDate.now();
@@ -69,6 +80,10 @@ public class MainWindowController implements Initializable{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("addtaskwindow.fxml"));
             Parent root = loader.load();
 
+            // Set the reference
+            AddTaskWindowController addTaskController = loader.getController();
+            addTaskController.setMainWindowController(this);
+
             Stage popupStage = new Stage();
             popupStage.initModality(Modality.APPLICATION_MODAL);
             popupStage.setTitle("Add Task");
@@ -89,5 +104,14 @@ public class MainWindowController implements Initializable{
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
         String formattedDate = selectedDate.format(formatter);
         displayDateLabel.setText(formattedDate);
+
+        updateTaskListView(selectedDate);
+    }
+
+    public void updateTaskListView(LocalDate date) {
+        taskListView.getItems().clear(); // Clear previous items
+        List<Task> tasks = retrieveTasksForDate(date);
+        taskListView.getItems().addAll(tasks);
+        taskListView.setCellFactory(CheckboxListCell.forListView(task -> task.completedProperty()));
     }
 }

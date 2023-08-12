@@ -15,6 +15,11 @@ public class AddTaskWindowController{
     @FXML private Button addButton;
 
     private DatabaseService databaseService = new DatabaseService();
+    private MainWindowController mainWindowController;
+
+    public void setMainWindowController(MainWindowController mainWindowController) {
+        this.mainWindowController = mainWindowController;
+    }
 
     @FXML
     public void addTask() {
@@ -26,6 +31,10 @@ public class AddTaskWindowController{
         databaseService.addTask(taskName, date, tag, priority, false);
         clearFields();
         closePopupWindow();
+
+        if (mainWindowController != null) {
+            mainWindowController.updateTaskListView(date);
+        }
     }
 
     private void clearFields() {
