@@ -9,8 +9,11 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MainWindowController implements Initializable{
     @FXML private ComboBox<LocalDate> dateChoiceBox;
@@ -20,6 +23,7 @@ public class MainWindowController implements Initializable{
     @FXML private VBox tagsVBox;
 
     DatabaseService databaseService = new DatabaseService();
+    private Set<String> selectedTags = new HashSet<>();
 
     // Initialization logic for the main window
     @Override
@@ -40,14 +44,19 @@ public class MainWindowController implements Initializable{
         List<String> uniqueTags = retrieveUniqueTags();
         uniqueTags.forEach(tag -> {
             CheckBox checkBox = new CheckBox(tag);
-            checkBox.setOnAction(event -> handleTagCheckboxClicked(tag, checkBox.isSelected()));
+            checkBox.setOnAction(event -> handleTagCheckboxClicked(checkBox.getText(), checkBox.isSelected()));
             tagsVBox.getChildren().add(checkBox);
         });
     }
 
     private void handleTagCheckboxClicked(String tag, boolean isSelected) {
-        // Handle tag checkbox click event, e.g., perform an action based on the tag
-        // selection
+        // Handle tag checkbox click event, e.g., perform an action based on the tag selection
+        if (isSelected) {
+            selectedTags.add(tag);
+        } else {
+            selectedTags.remove(tag);
+        }
+        updateTaskListView(dateChoiceBox.getValue());
     }
 
     private List<Task> retrieveTasksForDate(LocalDate date) {
@@ -132,8 +141,19 @@ public class MainWindowController implements Initializable{
     }
 
     public void updateTaskListView(LocalDate date) {
-        taskListView.getItems().clear(); // Clear previous items
-        List<Task> tasks = retrieveTasksForDate(date);
+        // Clear previous items
+        taskListView.getItems().clear(); 
+        // Use today's date if no date is selected
+        LocalDate selectedDate = date != null ? date : LocalDate.now(); 
+        List<Task> tasks = retrieveTasksForDate(selectedDate);
+
+        if (!selectedTags.isEmpty()) {
+        // Filter tasks by selected tags
+        tasks = tasks.stream()
+            .filter(task -> selectedTags.contains(task.getTag()))
+            .collect(Collectors.toList());
+        }
+
         taskListView.getItems().addAll(tasks);
         taskListView.setCellFactory(CheckboxListCell.forListView(task -> task.completedProperty()));
     }
