@@ -74,4 +74,26 @@ public class DatabaseService {
             // Handle the exception
         }
     }
+
+    public List<String> retrieveUniqueTags() {
+        List<String> tags = new ArrayList<>();
+
+        String selectQuery = "SELECT DISTINCT tag FROM tasks";
+
+        try (Connection connection = DriverManager.getConnection(DB_URL);
+                PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+                ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                String tag = resultSet.getString("tag");
+                tags.add(tag);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+
+        return tags;
+    }
+
 }

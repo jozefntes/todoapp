@@ -3,6 +3,7 @@ package com.example;
 import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.*;
 import java.net.URL;
 import java.time.LocalDate;
@@ -15,6 +16,8 @@ public class MainWindowController implements Initializable{
     @FXML private ComboBox<LocalDate> dateChoiceBox;
     @FXML private Label displayDateLabel;
     @FXML private ListView<Task> taskListView;
+    @FXML private TitledPane tagsCollapsibleDropdown;
+    @FXML private VBox tagsVBox;
 
     DatabaseService databaseService = new DatabaseService();
 
@@ -33,6 +36,18 @@ public class MainWindowController implements Initializable{
         displayDateLabel.setText(formattedDate);
 
         updateTaskListView(today);
+
+        List<String> uniqueTags = retrieveUniqueTags();
+        uniqueTags.forEach(tag -> {
+            CheckBox checkBox = new CheckBox(tag);
+            checkBox.setOnAction(event -> handleTagCheckboxClicked(tag, checkBox.isSelected()));
+            tagsVBox.getChildren().add(checkBox);
+        });
+    }
+
+    private void handleTagCheckboxClicked(String tag, boolean isSelected) {
+        // Handle tag checkbox click event, e.g., perform an action based on the tag
+        // selection
     }
 
     private List<Task> retrieveTasksForDate(LocalDate date) {
@@ -108,10 +123,51 @@ public class MainWindowController implements Initializable{
         updateTaskListView(selectedDate);
     }
 
+    public void displayTasksAfterAdding(LocalDate selectedDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+        String formattedDate = selectedDate.format(formatter);
+        displayDateLabel.setText(formattedDate);
+
+        updateTaskListView(selectedDate);
+    }
+
     public void updateTaskListView(LocalDate date) {
         taskListView.getItems().clear(); // Clear previous items
         List<Task> tasks = retrieveTasksForDate(date);
         taskListView.getItems().addAll(tasks);
         taskListView.setCellFactory(CheckboxListCell.forListView(task -> task.completedProperty()));
+    }
+
+    private List<String> retrieveUniqueTags() {
+        return databaseService.retrieveUniqueTags(); // Modify the method in DatabaseService to retrieve unique tags
+    }
+
+    public void updateTagsDropdown() {
+        List<String> uniqueTags = retrieveUniqueTags();
+        List<CheckBox> existingCheckBoxes = new ArrayList<>();
+
+        // Remove existing checkboxes from VBox and store them
+        for (Node node : tagsVBox.getChildren()) {
+            if (node instanceof CheckBox) {
+                existingCheckBoxes.add((CheckBox) node);
+            }
+        }
+
+        tagsVBox.getChildren().clear(); // Clear all existing checkboxes
+
+        uniqueTags.forEach(tag -> {
+            CheckBox checkBox = new CheckBox(tag);
+            checkBox.setOnAction(event -> handleTagCheckboxClicked(tag, checkBox.isSelected()));
+
+            // If the tag checkbox was displayed before, reuse it
+            for (CheckBox existingCheckBox : existingCheckBoxes) {
+                if (existingCheckBox.getText().equals(tag)) {
+                    checkBox.setSelected(existingCheckBox.isSelected());
+                    break;
+                }
+            }
+
+            tagsVBox.getChildren().add(checkBox);
+        });
     }
 }

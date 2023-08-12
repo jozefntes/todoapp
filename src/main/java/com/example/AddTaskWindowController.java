@@ -29,11 +29,15 @@ public class AddTaskWindowController{
         boolean priority = priorityCheckBox.isSelected();
 
         databaseService.addTask(taskName, date, tag, priority, false);
+        
+        // Call the method to update tags dropdown
+        mainWindowController.updateTagsDropdown();
+
         clearFields();
         closePopupWindow();
 
         if (mainWindowController != null) {
-            mainWindowController.updateTaskListView(date);
+            mainWindowController.displayTasksAfterAdding(date);
         }
     }
 
