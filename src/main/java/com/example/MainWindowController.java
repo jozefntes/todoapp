@@ -19,8 +19,9 @@ public class MainWindowController implements Initializable{
     @FXML private ComboBox<LocalDate> dateChoiceBox;
     @FXML private Label displayDateLabel;
     @FXML private ListView<Task> taskListView;
-    @FXML private TitledPane tagsCollapsibleDropdown;
     @FXML private VBox tagsVBox;
+    @FXML private ListView<Task> highPriorityListView;
+    @FXML private ListView<Task> noPriorityListView;
 
     DatabaseService databaseService = new DatabaseService();
     private Set<String> selectedTags = new HashSet<>();
@@ -40,6 +41,7 @@ public class MainWindowController implements Initializable{
         displayDateLabel.setText(formattedDate);
 
         updateTaskListView(today);
+        updateTodaysTaskListView();
 
         List<String> uniqueTags = retrieveUniqueTags();
         uniqueTags.forEach(tag -> {
@@ -57,12 +59,21 @@ public class MainWindowController implements Initializable{
             selectedTags.remove(tag);
         }
         updateTaskListView(dateChoiceBox.getValue());
+        updateTodaysTaskListView();
     }
 
     private List<Task> retrieveTasksForDate(LocalDate date) {
         // Fetch tasks from your database based on the date
         // Return a list of Task objects
         return databaseService.retrieveTasksForDate(date);
+    }
+
+    private List<Task> retrieveTasksForTodayHighPriority() {
+        return databaseService.retrieveTasksForTodayHighPriority();
+    }
+
+    private List<Task> retrieveTasksForTodayNoPriority() {
+        return databaseService.retrieveTasksForTodayNoPriority();
     }
     
     private List<LocalDate> generateDateList() {
@@ -156,6 +167,32 @@ public class MainWindowController implements Initializable{
 
         taskListView.getItems().addAll(tasks);
         taskListView.setCellFactory(CheckboxListCell.forListView(task -> task.completedProperty()));
+    }
+
+    public void updateTodaysTaskListView() {
+        LocalDate today = LocalDate.now();
+
+        List<Task> highPriorityTasks = retrieveTasksForTodayHighPriority();
+        List<Task> noPriorityTasks = retrieveTasksForTodayNoPriority();
+
+        // Update high priority tasks list view
+        if (highPriorityListView != null) {
+            highPriorityListView.getItems().clear();
+            highPriorityListView.getItems().addAll(highPriorityTasks);
+            highPriorityListView.setCellFactory(CheckboxListCell.forListView(task -> task.completedProperty()));
+        }
+
+        // Update no priority tasks list view
+        if (noPriorityListView != null) {
+            noPriorityListView.getItems().clear();
+            noPriorityListView.getItems().addAll(noPriorityTasks);
+            noPriorityListView.setCellFactory(CheckboxListCell.forListView(task -> task.completedProperty()));
+        }
+
+        // Update main task list view if the selected date is today
+        if (dateChoiceBox.getValue() == null || dateChoiceBox.getValue().equals(today)) {
+            updateTaskListView(today);
+        }
     }
 
     private List<String> retrieveUniqueTags() {

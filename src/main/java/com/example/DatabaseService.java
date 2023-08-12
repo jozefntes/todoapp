@@ -96,4 +96,60 @@ public class DatabaseService {
         return tags;
     }
 
+    public List<Task> retrieveTasksForTodayHighPriority() {
+        List<Task> tasks = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        String selectQuery = "SELECT * FROM tasks WHERE priority = 1 AND date = ?";
+
+        try (Connection connection = DriverManager.getConnection(DB_URL);
+                PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
+
+            preparedStatement.setString(1, today.toString());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String taskName = resultSet.getString("taskname");
+                boolean completed = resultSet.getInt("complete") == 1;
+                String tag = resultSet.getString("tag");
+                boolean priority = resultSet.getInt("priority") == 1;
+                Task task = new Task(taskName, completed, tag, priority);
+                tasks.add(task);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+
+        return tasks;
+    }
+
+    public List<Task> retrieveTasksForTodayNoPriority() {
+        List<Task> tasks = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        String selectQuery = "SELECT * FROM tasks WHERE priority = 0 AND date = ?";
+
+        try (Connection connection = DriverManager.getConnection(DB_URL);
+                PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
+
+            preparedStatement.setString(1, today.toString());
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String taskName = resultSet.getString("taskname");
+                boolean completed = resultSet.getInt("complete") == 1;
+                String tag = resultSet.getString("tag");
+                boolean priority = resultSet.getInt("priority") == 1;
+                Task task = new Task(taskName, completed, tag, priority);
+                tasks.add(task);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+
+        return tasks;
+    }
+
 }

@@ -29,6 +29,7 @@ public class Task {
     }
 
     public BooleanProperty completedProperty() { // Change the method name
+
         return completed;
     }
 
