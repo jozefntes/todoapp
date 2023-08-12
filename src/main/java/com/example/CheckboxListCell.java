@@ -35,8 +35,7 @@ public class CheckboxListCell<T> extends ListCell<T> {
         } else {
             Task task = (Task) item;
             setText(task.getTaskName());
-            checkBox.setSelected(false);
-            checkBox.selectedProperty().bindBidirectional(getSelectedProperty(item));
+            checkBox.setSelected(task.isCompleted()); // Set checkbox based on task's completion status
             setGraphic(checkBox);
         }
     }
@@ -44,8 +43,5 @@ public class CheckboxListCell<T> extends ListCell<T> {
     public static <T> Callback<ListView<T>, ListCell<T>> forListView(Callback<T, BooleanProperty> selectedPropertyCallback) {
         return listView -> new CheckboxListCell<>(selectedPropertyCallback);
     }
-
-    private BooleanProperty getSelectedProperty(T item) {
-        return selectedPropertyCallback.call(item);
-    }
 }
+
