@@ -35,7 +35,8 @@ public class CheckboxListCell<T> extends ListCell<T> {
         } else {
             Task task = (Task) item;
             setText(task.getTaskName());
-            checkBox.setSelected(task.isCompleted()); // Set checkbox based on task's completion status
+            // Set checkbox based on task's completion status
+            checkBox.setSelected(task.isCompleted()); 
             setGraphic(checkBox);
         }
     }

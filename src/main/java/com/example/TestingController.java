@@ -1,3 +1,5 @@
+// Class used ONLY for testing purposes
+
 package com.example;
 
 import javafx.beans.property.SimpleBooleanProperty;

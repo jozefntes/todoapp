@@ -1,3 +1,5 @@
+// Class that has the members of a Task object
+
 package com.example;
 
 import javafx.beans.property.BooleanProperty;
@@ -28,8 +30,7 @@ public class Task {
         return completed.get();
     }
 
-    public BooleanProperty completedProperty() { // Change the method name
-
+    public BooleanProperty completedProperty() {
         return completed;
     }
 

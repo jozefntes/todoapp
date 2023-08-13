@@ -1,3 +1,5 @@
+// Controller class that controles the mainwindow.fxml
+
 package com.example;
 
 import javafx.fxml.*;
@@ -29,20 +31,25 @@ public class MainWindowController implements Initializable{
     // Initialization logic for the main window
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Generates a list of dates for the ComboBox
         List<LocalDate> dateList = generateDateList();
         dateChoiceBox.getItems().addAll(dateList);
         // Set a custom cell factory to display formatted dates in the ComboBox
         dateChoiceBox.setCellFactory(param -> new DateListCell());
         dateChoiceBox.setButtonCell(new DateListCell());
         
+        // Displays today's date as default in the main taskListView header
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
         String formattedDate = today.format(formatter);
         displayDateLabel.setText(formattedDate);
 
+        // Displays today's tasks in the main taskListView as default
         updateTaskListView(today);
+        // Display today's tasks in the todays tasks high and no priority listViews
         updateTodaysTaskListView();
 
+        // Get unique tags to populate the collapsible dropdown for tags
         List<String> uniqueTags = retrieveUniqueTags();
         uniqueTags.forEach(tag -> {
             CheckBox checkBox = new CheckBox(tag);
@@ -51,43 +58,36 @@ public class MainWindowController implements Initializable{
         });
     }
 
+    // Method that handles a tag selection
+        // If a tag is selected, it will only display the tasks with the selected tag and date
+        // If more tags are selected, it will display those tasks too
+        // If none are selected, it will display all the tasks for the selected date
     private void handleTagCheckboxClicked(String tag, boolean isSelected) {
-        // Handle tag checkbox click event, e.g., perform an action based on the tag selection
         if (isSelected) {
             selectedTags.add(tag);
         } else {
             selectedTags.remove(tag);
         }
+        // Update both the main taskListView and the high and no priority listViews
         updateTaskListView(dateChoiceBox.getValue());
         updateTodaysTaskListView();
     }
 
-    private List<Task> retrieveTasksForDate(LocalDate date) {
-        // Fetch tasks from your database based on the date
-        // Return a list of Task objects
-        return databaseService.retrieveTasksForDate(date);
-    }
-
-    private List<Task> retrieveTasksForTodayHighPriority() {
-        return databaseService.retrieveTasksForTodayHighPriority();
-    }
-
-    private List<Task> retrieveTasksForTodayNoPriority() {
-        return databaseService.retrieveTasksForTodayNoPriority();
-    }
-    
+    // Method that generates the dates a list of LocalDate
+        // This is used in the initialize method to populate the ComboBox to chose a display date
     private List<LocalDate> generateDateList() {
         List<LocalDate> dateList = new ArrayList<>();
         LocalDate today = LocalDate.now();
-        
-        for (int i = 0; i < 60; i++) { // Generate dates for the next 60 days
+
+        // Generate dates for the next 60 days
+        for (int i = 0; i < 60; i++) { 
             dateList.add(today.plusDays(i));
         }
         
         return dateList;
     }
 
-    // Custom ListCell to format the dates in the ComboBox
+    // Method to format the dates in the ComboBox
     private class DateListCell extends ListCell<LocalDate> {
         private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
 
@@ -110,6 +110,7 @@ public class MainWindowController implements Initializable{
         openPopup();
     }
 
+    // Method that opens the popup window to add a task
     private void openPopup() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("addtaskwindow.fxml"));
@@ -133,6 +134,9 @@ public class MainWindowController implements Initializable{
         }
     }
 
+    // Method that is called when a date is selected from the comboBox
+        // It displays the selected date in the header
+        // and updates the main taskListView with the selected date tasks
     @FXML
     private void displayTasksFromDate() {
         LocalDate selectedDate = dateChoiceBox.getSelectionModel().getSelectedItem();
@@ -143,6 +147,10 @@ public class MainWindowController implements Initializable{
         updateTaskListView(selectedDate);
     }
 
+    // Method that 
+        // Displays the selected date in the header
+        // and updates the main taskListView with the selected date tasks
+    // This is method is called from the AddTaskWindowController class
     public void displayTasksAfterAdding(LocalDate selectedDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
         String formattedDate = selectedDate.format(formatter);
@@ -151,6 +159,9 @@ public class MainWindowController implements Initializable{
         updateTaskListView(selectedDate);
     }
 
+    // Method that updates the taskListView with the passed date
+        // It displays the tasks from the passed date in the main taskListView
+        // and adds a checkbox that is bound to the task
     public void updateTaskListView(LocalDate date) {
         // Clear previous items
         taskListView.getItems().clear(); 
@@ -169,6 +180,10 @@ public class MainWindowController implements Initializable{
         taskListView.setCellFactory(CheckboxListCell.forListView(task -> task.completedProperty()));
     }
 
+    // Method that updates the high and no priority listViews
+        // It displays the tasks with priority in the high priority collapsible dropdown,
+        // displays the tasks with no priority in the no priority collapsible dropdown,
+        // and adds a checkbox that is bound to the task in both listViews
     public void updateTodaysTaskListView() {
         LocalDate today = LocalDate.now();
 
@@ -195,10 +210,30 @@ public class MainWindowController implements Initializable{
         }
     }
 
-    private List<String> retrieveUniqueTags() {
-        return databaseService.retrieveUniqueTags(); // Modify the method in DatabaseService to retrieve unique tags
+        // Method that retrieves tasks from the DatabaseService for a specific date
+    private List<Task> retrieveTasksForDate(LocalDate date) {
+        // Fetch tasks from your database based on the date
+        // Return a list of Task objects
+        return databaseService.retrieveTasksForDate(date);
     }
 
+    // Method that retrieves tasks from the DatabaseService for today with high priority
+    private List<Task> retrieveTasksForTodayHighPriority() {
+        return databaseService.retrieveTasksForTodayHighPriority();
+    }
+
+    // Method that retrieves tasks from the DatabaseService for today with no priority
+    private List<Task> retrieveTasksForTodayNoPriority() {
+        return databaseService.retrieveTasksForTodayNoPriority();
+    }
+
+    // Method that retrieves the unique Tags from all the tasks in the database
+    private List<String> retrieveUniqueTags() {
+        return databaseService.retrieveUniqueTags();
+    }
+
+    // Method that updates the tags dropdown
+        // This is used when a new task is added
     public void updateTagsDropdown() {
         List<String> uniqueTags = retrieveUniqueTags();
         List<CheckBox> existingCheckBoxes = new ArrayList<>();

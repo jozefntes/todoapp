@@ -1,3 +1,5 @@
+// Controller class that controls the addtaskwindow.fxml
+
 package com.example;
 
 import javafx.fxml.*;
@@ -17,10 +19,15 @@ public class AddTaskWindowController{
     private DatabaseService databaseService = new DatabaseService();
     private MainWindowController mainWindowController;
 
+    // Method that sets reference to the main window controller
     public void setMainWindowController(MainWindowController mainWindowController) {
         this.mainWindowController = mainWindowController;
     }
 
+    // Method called when the addButton is pressed
+        // It gets the values from the fields,
+        // adds the task to the database,
+        // and clears the fields to close the popup window
     @FXML
     public void addTask() {
         String taskName = nameField.getText();
@@ -38,9 +45,11 @@ public class AddTaskWindowController{
 
         if (mainWindowController != null) {
             mainWindowController.displayTasksAfterAdding(date);
+            mainWindowController.updateTodaysTaskListView();
         }
     }
 
+    // Method that clears all the fields in the scene
     private void clearFields() {
         nameField.clear();
         datePicker.setValue(null);
@@ -48,6 +57,7 @@ public class AddTaskWindowController{
         priorityCheckBox.setSelected(false);
     }
 
+    // Method that closes the popup window to get back to the main scene
     private void closePopupWindow() {
         // Get the reference to the stage (popup window)
         Stage popupStage = (Stage) addButton.getScene().getWindow();
