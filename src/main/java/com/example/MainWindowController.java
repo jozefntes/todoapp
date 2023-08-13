@@ -31,18 +31,17 @@ public class MainWindowController implements Initializable{
     // Initialization logic for the main window
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Generates a list of dates for the ComboBox
-        List<LocalDate> dateList = generateDateList();
-        dateChoiceBox.getItems().addAll(dateList);
-        // Set a custom cell factory to display formatted dates in the ComboBox
-        dateChoiceBox.setCellFactory(param -> new DateListCell());
-        dateChoiceBox.setButtonCell(new DateListCell());
+        // Updates the ChoiceBox to have from earliest date in database to 60 days from today
+        updateDateChoiceBox();
         
         // Displays today's date as default in the main taskListView header
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
         String formattedDate = today.format(formatter);
         displayDateLabel.setText(formattedDate);
+
+        // Set the default selected date to today
+        dateChoiceBox.getSelectionModel().select(today);
 
         // Displays today's tasks in the main taskListView as default
         updateTaskListView(today);
@@ -79,11 +78,21 @@ public class MainWindowController implements Initializable{
         List<LocalDate> dateList = new ArrayList<>();
         LocalDate today = LocalDate.now();
 
-        // Generate dates for the next 60 days
-        for (int i = 0; i < 60; i++) { 
-            dateList.add(today.plusDays(i));
+        // Retrieve the earliest date from the tasks in the database
+        LocalDate earliestDate = databaseService.retrieveEarliestTaskDate();
+
+        // Calculate the ending point (60 days from today)
+        LocalDate endDate = today.plusDays(60);
+
+        // Use the earliest date as the starting point if available
+        LocalDate startDate = earliestDate != null ? earliestDate : today;
+
+        // Generate dates within the range of the earliest date to 60 days from today
+        while (!startDate.isAfter(endDate)) {
+            dateList.add(startDate);
+            startDate = startDate.plusDays(1);
         }
-        
+
         return dateList;
     }
 
@@ -157,6 +166,19 @@ public class MainWindowController implements Initializable{
         displayDateLabel.setText(formattedDate);
 
         updateTaskListView(selectedDate);
+    }
+
+    // Method that updates the dateChoiceBox
+    public void updateDateChoiceBox() {
+        if (dateChoiceBox != null) {
+            dateChoiceBox.getItems().clear();
+        }
+        // Generates a list of dates for the ComboBox
+        List<LocalDate> dateList = generateDateList();
+        dateChoiceBox.getItems().addAll(dateList);
+        // Set a custom cell factory to display formatted dates in the ComboBox
+        dateChoiceBox.setCellFactory(param -> new DateListCell());
+        dateChoiceBox.setButtonCell(new DateListCell());
     }
 
     // Method that updates the taskListView with the passed date

@@ -39,6 +39,7 @@ public class AddTaskWindowController{
         
         // Call the method to update tags dropdown
         mainWindowController.updateTagsDropdown();
+        mainWindowController.updateDateChoiceBox();
 
         clearFields();
         closePopupWindow();

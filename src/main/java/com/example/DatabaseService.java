@@ -160,4 +160,28 @@ public class DatabaseService {
         }
     }
 
+    // Method that retrieves the earliest date in the database to populate the date dropdown
+    public LocalDate retrieveEarliestTaskDate() {
+        LocalDate earliestDate = null;
+
+        String selectQuery = "SELECT MIN(date) FROM tasks";
+
+        try (Connection connection = DriverManager.getConnection(DB_URL);
+                PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+                ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            if (resultSet.next()) {
+                String dateString = resultSet.getString(1);
+                if (dateString != null) {
+                    earliestDate = LocalDate.parse(dateString);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle the exception
+        }
+
+        return earliestDate;
+    }
+
 }
