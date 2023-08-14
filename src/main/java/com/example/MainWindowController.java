@@ -43,10 +43,9 @@ public class MainWindowController implements Initializable{
         displayDateLabel.setText(formattedDate);
 
         // Set the default selected date to today
-        dateChoiceBox.getSelectionModel().select(today);
-
         // Displays today's tasks in the main taskListView as default
-        updateTaskListView(today);
+        dateChoiceBox.getSelectionModel().select(today);
+        
         // Display today's tasks in the todays tasks high and no priority listViews
         updateTodaysTaskListView();
 
@@ -181,6 +180,10 @@ public class MainWindowController implements Initializable{
         // Set a custom cell factory to display formatted dates in the ComboBox
         dateChoiceBox.setCellFactory(param -> new DateListCell());
         dateChoiceBox.setButtonCell(new DateListCell());
+    }
+
+    public void setDateChoiceBox(LocalDate date) {
+        dateChoiceBox.getSelectionModel().select(date);
     }
 
     // Method that updates the taskListView with the passed date
