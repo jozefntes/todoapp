@@ -24,6 +24,8 @@ public class MainWindowController implements Initializable{
     @FXML private VBox tagsVBox;
     @FXML private ListView<Task> highPriorityListView;
     @FXML private ListView<Task> noPriorityListView;
+    @FXML private Label completionLabel;
+    @FXML private ProgressBar completionBar;
 
     DatabaseService databaseService = new DatabaseService();
     private Set<String> selectedTags = new HashSet<>();
@@ -200,6 +202,9 @@ public class MainWindowController implements Initializable{
 
         taskListView.getItems().addAll(tasks);
         taskListView.setCellFactory(CheckboxListCell.forListView(task -> task.completedProperty()));
+
+        // Update completion info after updating taskListView
+        updateCompletionInfo();
     }
 
     // Method that updates the high and no priority listViews
@@ -229,6 +234,21 @@ public class MainWindowController implements Initializable{
         // Update main task list view if the selected date is today
         if (dateChoiceBox.getValue() == null || dateChoiceBox.getValue().equals(today)) {
             updateTaskListView(today);
+        }
+    }
+
+    // Method to calculate completion percentage and update ProgressBar
+    private void updateCompletionInfo() {
+        List<Task> tasks = taskListView.getItems();
+        if (tasks.isEmpty()) {
+            completionLabel.setText("Completion: 0%");
+            completionBar.setProgress(0.0);
+        } else {
+            long completedCount = tasks.stream().filter(Task::isCompleted).count();
+            double completionPercentage = (completedCount * 100.0) / tasks.size();
+
+            completionLabel.setText(String.format("Completion: %.2f%%", completionPercentage));
+            completionBar.setProgress(completionPercentage / 100.0);
         }
     }
 
