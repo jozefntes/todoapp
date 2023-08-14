@@ -64,7 +64,7 @@
                         <Insets bottom="5.0" top="5.0" />
                      </VBox.margin>
                   </Label>
-                  <ProgressBar fx:id="completionBar" maxWidth="1.7976931348623157E308" progress="0.0">
+                  <ProgressBar fx:id="completionBar" maxWidth="1.7976931348623157E308" prefHeight="40.0" progress="0.0">
                      <VBox.margin>
                         <Insets left="10.0" right="10.0" />
                      </VBox.margin>
