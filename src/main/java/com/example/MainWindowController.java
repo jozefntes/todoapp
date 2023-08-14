@@ -205,6 +205,17 @@ public class MainWindowController implements Initializable{
 
         // Update completion info after updating taskListView
         updateCompletionInfo();
+
+        taskListView.getItems().addAll(tasks);
+        taskListView.setCellFactory(CheckboxListCell.forListView(task -> task.completedProperty()));
+
+        // Add listeners to task completion status properties
+        tasks.forEach(task -> task.completedProperty().addListener((observable, oldValue, newValue) -> {
+            updateCompletionInfo();
+        }));
+
+        // Update completion info after updating taskListView
+        updateCompletionInfo();
     }
 
     // Method that updates the high and no priority listViews
